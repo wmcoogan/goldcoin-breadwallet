@@ -43,14 +43,19 @@
 #define CIRCLE  @"\xE2\x97\x8C" // dotted circle (utf-8)
 #define DOT     @"\xE2\x97\x8F" // black circle (utf-8)
 
-#define UNSPENT_URL          @"https://api.breadwallet.com/q/addrs/utxo"
-#define UNSPENT_FAILOVER_URL @"https://insight.bitpay.com/api/addrs/utxo"
+#define UNSPENT_URL          @"https://chainz.cryptoid.info/gld/api.dws?q=unspent&key=d47da926b82e&active="
+#define UNSPENT_FAILOVER_URL @"https://chainz.cryptoid.info/gld/api.dws?q=unspent&key=d47da926b82e&active="
 #define FEE_PER_KB_URL       @"https://api.breadwallet.com/fee-per-kb"
 #define TICKER_URL           @"https://api.breadwallet.com/rates"
 #define TICKER_FAILOVER_URL  @"https://bitpay.com/rates"
 
+#define TICKER_GLD_URL       @"https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-gld"
+#define TICKER_GLD_FAILOVER_URL @"https://www.cryptopia.co.nz/api/GetMarket/2623"
+#define POLONIEX_TICKER_URL  TICKER_GLD_URL
+#define TICKER_REFRESH_TIME 60.0
+
 #define SEED_ENTROPY_LENGTH   (128/8)
-#define SEC_ATTR_SERVICE      @"org.voisine.breadwallet"
+#define SEC_ATTR_SERVICE      @"org.goldcoin.goldwallet"
 #define DEFAULT_CURRENCY_CODE @"USD"
 #define DEFAULT_SPENT_LIMIT   SATOSHIS
 
@@ -61,6 +66,9 @@
 #define SPEND_LIMIT_AMOUNT_KEY  @"SPEND_LIMIT_AMOUNT"
 #define SECURE_TIME_KEY         @"SECURE_TIME"
 #define FEE_PER_KB_KEY          @"FEE_PER_KB"
+
+#define POLONIEX_DASH_BTC_PRICE_KEY  @"POLONIEX_DASH_BTC_PRICE"
+#define POLONIEX_DASH_BTC_UPDATE_TIME_KEY  @"POLONIEX_DASH_BTC_UPDATE_TIME"
 
 #define MNEMONIC_KEY        @"mnemonic"
 #define CREATION_TIME_KEY   @"creationtime"
@@ -207,6 +215,10 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
 @property (nonatomic, strong) NSMutableSet *failedPins;
 @property (nonatomic, strong) id protectedObserver;
 
+@property (nonatomic, strong) NSNumber * _Nullable bitcoinDashPrice; // exchange rate in bitcoin per dash
+@property (nonatomic, strong) NSNumber * _Nullable localCurrencyBitcoinPrice; // exchange rate in local currency units per bitcoin
+@property (nonatomic, strong) NSNumber * _Nullable localCurrencyDashPrice;
+
 @end
 
 @implementation BRWalletManager
@@ -249,7 +261,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
     self.localFormat.numberStyle = NSNumberFormatterCurrencyStyle;
     self.localFormat.generatesDecimalNumbers = YES;
     self.localFormat.negativeFormat = self.format.negativeFormat;
-
+    
     self.protectedObserver =
         [[NSNotificationCenter defaultCenter] addObserverForName:UIApplicationProtectedDataDidBecomeAvailable object:nil
         queue:nil usingBlock:^(NSNotification *note) {
@@ -271,7 +283,10 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
     _currencyPrices = [defs arrayForKey:CURRENCY_PRICES_KEY];
     self.localCurrencyCode = ([defs stringForKey:LOCAL_CURRENCY_CODE_KEY]) ?
         [defs stringForKey:LOCAL_CURRENCY_CODE_KEY] : [[NSLocale currentLocale] objectForKey:NSLocaleCurrencyCode];
-    dispatch_async(dispatch_get_main_queue(), ^{ [self updateExchangeRate]; });
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self updateExchangeRate];
+        [self updateDashExchangeRate];
+    });
 }
 
 - (void)dealloc
@@ -859,7 +874,11 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
 
 - (double)localCurrencyPrice
 {
-    return self.localPrice.doubleValue;
+    if (!_bitcoinDashPrice || !self.localPrice.doubleValue) {
+        return _localCurrencyDashPrice.doubleValue;
+    } else {
+        return (_bitcoinDashPrice.doubleValue * self.localPrice.doubleValue);
+    }
 }
 
 // local currency ISO code
@@ -967,6 +986,92 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
     }] resume];
 }
 
+-(NSNumber*)bitcoinDashPrice {
+    if (_bitcoinDashPrice.doubleValue == 0) {
+        NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+        
+        double poloniexPrice = [[defs objectForKey:POLONIEX_DASH_BTC_PRICE_KEY] doubleValue];
+        double dashcentralPrice = 0;//[[defs objectForKey:DASHCENTRAL_DASH_BTC_PRICE_KEY] doubleValue];
+        if (poloniexPrice > 0) {
+            if (dashcentralPrice > 0) {
+                _bitcoinDashPrice = @((poloniexPrice + dashcentralPrice)/2.0);
+            } else {
+                _bitcoinDashPrice = @(poloniexPrice);
+            }
+        } else if (dashcentralPrice > 0) {
+            _bitcoinDashPrice = @(dashcentralPrice);
+        }
+    }
+    return _bitcoinDashPrice;
+}
+
+- (void)refreshBitcoinDashPrice{
+    NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+    double poloniexPrice = [[defs objectForKey:POLONIEX_DASH_BTC_PRICE_KEY] doubleValue];
+    double dashcentralPrice = 0;//[[defs objectForKey:DASHCENTRAL_DASH_BTC_PRICE_KEY] doubleValue];
+    NSNumber * newPrice = 0;
+    if (poloniexPrice > 0) {
+        if (dashcentralPrice > 0) {
+            newPrice = @((poloniexPrice + dashcentralPrice)/2.0);
+        } else {
+            newPrice = @(poloniexPrice);
+        }
+    } else if (dashcentralPrice > 0) {
+        newPrice = @(dashcentralPrice);
+    }
+    
+    if (! _wallet ) return;
+    //if ([newPrice doubleValue] == [_bitcoinDashPrice doubleValue]) return;
+    _bitcoinDashPrice = newPrice;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [[NSNotificationCenter defaultCenter] postNotificationName:BRWalletBalanceChangedNotification object:nil];
+    });
+}
+
+
+// until there is a public api for dash prices among multiple currencies it's better that we pull Bitcoin prices per currency and convert it to dash
+- (void)updateDashExchangeRate
+{
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateDashExchangeRate) object:nil];
+    [self performSelector:@selector(updateDashExchangeRate) withObject:nil afterDelay:TICKER_REFRESH_TIME];
+    if (self.reachability.currentReachabilityStatus == NotReachable) return;
+    
+    
+    NSURLRequest *req = [NSURLRequest requestWithURL:[NSURL URLWithString:POLONIEX_TICKER_URL]
+                                         cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
+    
+    [[[NSURLSession sharedSession] dataTaskWithRequest:req
+         completionHandler:^(NSData *data, NSURLResponse *response, NSError *connectionError) {
+             if (((((NSHTTPURLResponse*)response).statusCode /100) != 2) || connectionError) {
+                 NSLog(@"connectionError %@ (status %ld)", connectionError,(long)((NSHTTPURLResponse*)response).statusCode);
+                 return;
+             }
+             NSError *error = nil;
+             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+             NSArray * orders = [json objectForKey:@"result"];
+             if ([orders count]) {
+                 NSNumber * lastTradePrice = [[orders objectAtIndex:0] objectForKey:@"Last"];
+                 if (lastTradePrice) {
+                     NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
+                     NSLocale *usa = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
+                     numberFormatter.locale = usa;
+                     numberFormatter.numberStyle = NSNumberFormatterDecimalStyle;
+                     NSNumber *lastTradePriceNumber = lastTradePrice;//[localnumberFormatter numberFromString:lastTradePrice];
+                     NSUserDefaults *defs = [NSUserDefaults standardUserDefaults];
+                     [defs setObject:lastTradePriceNumber forKey:POLONIEX_DASH_BTC_PRICE_KEY];
+                     [defs setObject:[NSDate date] forKey:POLONIEX_DASH_BTC_UPDATE_TIME_KEY];
+                     [defs synchronize];
+                     [self refreshBitcoinDashPrice];
+                 }
+             }
+             NSLog(@"bittrex exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:SATOSHIS],
+                   [self stringForDashAmount:SATOSHIS]);
+         }
+      ] resume];
+    
+}
+
+
 - (void)updateExchangeRate
 {
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(updateExchangeRate) object:nil];
@@ -981,6 +1086,8 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
 
 - (void)updateFeePerKb
 {
+    return;
+    /*
     if (self.reachability.currentReachabilityStatus == NotReachable) return;
 
     NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:FEE_PER_KB_URL]
@@ -1013,6 +1120,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
             _wallet.feePerKb = newFee;
         }
     }] resume];
+     */
 }
 
 // MARK: - query unspent outputs
@@ -1037,17 +1145,19 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
 - (void)utxos:(NSString *)unspentURL forAddresses:(NSArray *)addresses
 completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError *error))completion
 {
-    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:unspentURL]
+    NSMutableString * url = [NSMutableString stringWithString:unspentURL];
+    [url appendString:addresses[0]];
+    NSMutableURLRequest *req = [NSMutableURLRequest requestWithURL:[NSURL URLWithString:url]
                                 cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:20.0];
-    NSMutableArray *args = [NSMutableArray array];
+    //NSMutableArray *args = [NSMutableArray array];
     NSMutableCharacterSet *charset = [[NSCharacterSet URLQueryAllowedCharacterSet] mutableCopy];
     
     [charset removeCharactersInString:@"&="];
-    [args addObject:[@"addrs=" stringByAppendingString:[[addresses componentsJoinedByString:@","]
-                                                        stringByAddingPercentEncodingWithAllowedCharacters:charset]]];
-    req.HTTPMethod = @"POST";
-    req.HTTPBody = [[args componentsJoinedByString:@"&"] dataUsingEncoding:NSUTF8StringEncoding];
-    NSLog(@"%@ POST: %@", req.URL.absoluteString,
+    //[args addObject:[@"addrs=" stringByAppendingString:[[addresses componentsJoinedByString:@","]
+                                                        //stringByAddingPercentEncodingWithAllowedCharacters:charset]]];
+    req.HTTPMethod = @"GET";
+    //req.HTTPBody = [[args componentsJoinedByString:@"&"] dataUsingEncoding:NSUTF8StringEncoding];
+    NSLog(@"%@ GET: %@", req.URL.absoluteString,
           [[NSString alloc] initWithData:req.HTTPBody encoding:NSUTF8StringEncoding]);
     
     [[[NSURLSession sharedSession] dataTaskWithRequest:req
@@ -1060,9 +1170,11 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
         NSMutableArray *utxos = [NSMutableArray array], *amounts = [NSMutableArray array],
                        *scripts = [NSMutableArray array];
+        
+        NSArray * entries = [json objectForKey:@"unspent_outputs"];
         BRUTXO o;
 
-        if (error || ! [json isKindOfClass:[NSArray class]]) {
+        if (error || ! [entries isKindOfClass:[NSArray class]]) {
             completion(nil, nil, nil,
                        [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                         [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil),
@@ -1070,14 +1182,14 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
             return;
         }
 
-        for (NSDictionary *utxo in json) {
+        for (NSDictionary *utxo in entries) {
             if (! [utxo isKindOfClass:[NSDictionary class]] ||
-                ! [utxo[@"txid"] isKindOfClass:[NSString class]] ||
-                [utxo[@"txid"] hexToData].length != sizeof(UInt256) ||
-                ! [utxo[@"vout"] isKindOfClass:[NSNumber class]] ||
-                ! [utxo[@"scriptPubKey"] isKindOfClass:[NSString class]] ||
-                ! [utxo[@"scriptPubKey"] hexToData] ||
-                ! [utxo[@"satoshis"] isKindOfClass:[NSNumber class]]) {
+                ! [utxo[@"tx_hash"] isKindOfClass:[NSString class]] ||
+                [utxo[@"tx_hash"] hexToData].length != sizeof(UInt256) ||
+                ! [utxo[@"tx_ouput_n"] isKindOfClass:[NSNumber class]] ||
+                ! [utxo[@"script"] isKindOfClass:[NSString class]] ||
+                ! [utxo[@"script"] hexToData] ||
+                ! [utxo[@"value"] isKindOfClass:[NSString class]]) {
                 completion(nil, nil, nil,
                            [NSError errorWithDomain:@"BreadWallet" code:417 userInfo:@{NSLocalizedDescriptionKey:
                             [NSString stringWithFormat:NSLocalizedString(@"unexpected response from %@", nil),
@@ -1085,11 +1197,12 @@ completion:(void (^)(NSArray *utxos, NSArray *amounts, NSArray *scripts, NSError
                 return;
             }
 
-            o.hash = *(const UInt256 *)[utxo[@"txid"] hexToData].reverse.bytes;
-            o.n = [utxo[@"vout"] unsignedIntValue];
+            o.hash = *(const UInt256 *)[utxo[@"tx_hash"] hexToData].reverse.bytes;
+            o.n = [utxo[@"tx_ouput_n"] unsignedIntValue];
             [utxos addObject:brutxo_obj(o)];
-            [amounts addObject:utxo[@"satoshis"]];
-            [scripts addObject:[utxo[@"scriptPubKey"] hexToData]];
+            NSNumber *amount = [self.localFormat numberFromString:utxo[@"value"]];
+            [amounts addObject:amount];
+            [scripts addObject:[utxo[@"script"] hexToData]];
         }
 
         completion(utxos, amounts, scripts, nil);
@@ -1202,7 +1315,9 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
     if ([string hasPrefix:@"<"]) string = [string substringFromIndex:1];
 
     NSNumber *n = [self.localFormat numberFromString:string];
-    int64_t price = [[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
+    
+    NSNumber * dashLocal = [NSNumber numberWithDouble:self.localPrice.doubleValue*self.bitcoinDashPrice.doubleValue];
+    int64_t price = [[NSDecimalNumber decimalNumberWithDecimal:dashLocal.decimalValue]
                       decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
             local = [[NSDecimalNumber decimalNumberWithDecimal:n.decimalValue]
                       decimalNumberByMultiplyingByPowerOf10:self.localFormat.maximumFractionDigits].longLongValue,
@@ -1224,9 +1339,11 @@ completion:(void (^)(BRTransaction *tx, uint64_t fee, NSError *error))completion
 - (NSString *)localCurrencyStringForAmount:(int64_t)amount
 {
     if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
-    if (self.localPrice.doubleValue <= DBL_EPSILON) return @""; // no exchange rate data
+    if (self.localPrice.doubleValue <= DBL_EPSILON || self.bitcoinDashPrice.doubleValue <= DBL_EPSILON) return @""; // no exchange rate data
 
-    NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:self.localPrice.decimalValue]
+    NSNumber * local = [NSNumber numberWithDouble:self.localPrice.doubleValue*self.bitcoinDashPrice.doubleValue];
+    
+    NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal: local.decimalValue]
                            decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
                           decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:SATOSHIS]],
                      *min = [[NSDecimalNumber one]
@@ -1377,6 +1494,32 @@ replacementString:(NSString *)string
         [self.alertView show];
         [t becomeFirstResponder];
     }
+}
+
+- (NSString *)localCurrencyStringForDashAmount:(int64_t)amount
+{
+    if (amount == 0) return [self.localFormat stringFromNumber:@(0)];
+    if (!self.localCurrencyBitcoinPrice || !self.bitcoinDashPrice) return NSLocalizedString(@"Updating Price",@"Updating Price");
+    
+    NSNumber * local = [NSNumber numberWithDouble:self.localCurrencyBitcoinPrice.doubleValue*self.bitcoinDashPrice.doubleValue];
+    
+    
+    NSDecimalNumber *n = [[[NSDecimalNumber decimalNumberWithDecimal:local.decimalValue]
+                           decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithLongLong:llabs(amount)]]
+                          decimalNumberByDividingBy:(id)[NSDecimalNumber numberWithLongLong:SATOSHIS]],
+    *min = [[NSDecimalNumber one]
+            decimalNumberByMultiplyingByPowerOf10:-self.localFormat.maximumFractionDigits];
+    
+    // if the amount is too small to be represented in local currency (but is != 0) then return a string like "$0.01"
+    if ([n compare:min] == NSOrderedAscending) n = min;
+    if (amount < 0) n = [n decimalNumberByMultiplyingBy:(id)[NSDecimalNumber numberWithInt:-1]];
+    return [self.localFormat stringFromNumber:n];
+}
+
+- (NSString *)stringForDashAmount:(int64_t)amount
+{
+    return [self.format stringFromNumber:[(id)[NSDecimalNumber numberWithLongLong:amount]
+                                              decimalNumberByMultiplyingByPowerOf10:-self.format.maximumFractionDigits]];
 }
 
 @end
