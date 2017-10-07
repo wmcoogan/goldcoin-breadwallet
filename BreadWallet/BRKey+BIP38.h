@@ -25,6 +25,9 @@
 
 #import "BRKey.h"
 
+void scrypt(const void *pw, size_t pwlen, const void *salt, size_t slen, long n, int r, int p,
+            void *dk, size_t dklen);
+
 // BIP38 is a method for encrypting private keys with a passphrase
 // https://github.com/bitcoin/bips/blob/master/bip-0038.mediawiki
 
