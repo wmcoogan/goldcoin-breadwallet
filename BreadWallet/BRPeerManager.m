@@ -39,6 +39,7 @@
 #import "BREventManager.h"
 #import "breadwallet-Swift.h"
 #import <netdb.h>
+#include <stdlib.h>
 
 #if ! PEER_LOGGING
 #define NSLog(...)
@@ -77,34 +78,18 @@ static const char *dns_seeds[] = {
 // blockchain checkpoints - these are also used as starting points for partial chain downloads, so they need to be at
 // difficulty transition boundaries in order to verify the block difficulty at the immediately following transition
 static const struct { uint32_t height; const char *hash; uint32_t timestamp; uint32_t target; } checkpoint_array[] = {
-    {      0, "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f", 1231006505, 0x1d00ffff },
-    {  20160, "000000000f1aef56190aee63d33a373e6487132d522ff4cd98ccfc96566d461e", 1248481816, 0x1d00ffff },
-    {  40320, "0000000045861e169b5a961b7034f8de9e98022e7a39100dde3ae3ea240d7245", 1266191579, 0x1c654657 },
-    {  60480, "000000000632e22ce73ed38f46d5b408ff1cff2cc9e10daaf437dfd655153837", 1276298786, 0x1c0eba64 },
-    {  80640, "0000000000307c80b87edf9f6a0697e2f01db67e518c8a4d6065d1d859a3a659", 1284861847, 0x1b4766ed },
-    { 100800, "000000000000e383d43cc471c64a9a4a46794026989ef4ff9611d5acb704e47a", 1294031411, 0x1b0404cb },
-    { 120960, "0000000000002c920cf7e4406b969ae9c807b5c4f271f490ca3de1b0770836fc", 1304131980, 0x1b0098fa },
-    { 141120, "00000000000002d214e1af085eda0a780a8446698ab5c0128b6392e189886114", 1313451894, 0x1a094a86 },
-    { 161280, "00000000000005911fe26209de7ff510a8306475b75ceffd434b68dc31943b99", 1326047176, 0x1a0d69d7 },
-    { 181440, "00000000000000e527fc19df0992d58c12b98ef5a17544696bbba67812ef0e64", 1337883029, 0x1a0a8b5f },
-    { 201600, "00000000000003a5e28bef30ad31f1f9be706e91ae9dda54179a95c9f9cd9ad0", 1349226660, 0x1a057e08 },
-    { 221760, "00000000000000fc85dd77ea5ed6020f9e333589392560b40908d3264bd1f401", 1361148470, 0x1a04985c },
-    { 241920, "00000000000000b79f259ad14635739aaf0cc48875874b6aeecc7308267b50fa", 1371418654, 0x1a00de15 },
-    { 262080, "000000000000000aa77be1c33deac6b8d3b7b0757d02ce72fffddc768235d0e2", 1381070552, 0x1916b0ca },
-    { 282240, "0000000000000000ef9ee7529607286669763763e0c46acfdefd8a2306de5ca8", 1390570126, 0x1901f52c },
-    { 302400, "0000000000000000472132c4daaf358acaf461ff1c3e96577a74e5ebf91bb170", 1400928750, 0x18692842 },
-    { 322560, "000000000000000002df2dd9d4fe0578392e519610e341dd09025469f101cfa1", 1411680080, 0x181fb893 },
-    { 342720, "00000000000000000f9cfece8494800d3dcbf9583232825da640c8703bcd27e7", 1423496415, 0x1818bb87 },
-    { 362880, "000000000000000014898b8e6538392702ffb9450f904c80ebf9d82b519a77d5", 1435475246, 0x1816418e },
-    { 383040, "00000000000000000a974fa1a3f84055ad5ef0b2f96328bc96310ce83da801c9", 1447236692, 0x1810b289 },
-    { 403200, "000000000000000000c4272a5c68b4f55e5af734e88ceab09abf73e9ac3b6d01", 1458292068, 0x1806a4c3 },
-    { 423360, "000000000000000001630546cde8482cc183708f076a5e4d6f51cd24518e8f85", 1470163842, 0x18057228 },
-    { 443520, "00000000000000000345d0c7890b2c81ab5139c6e83400e5bed00d23a1f8d239", 1481765313, 0x18038b85 }
+    {      0, "dced3542896ed537cb06f9cb064319adb0da615f64dd8c5e5bad974398f44b24", 1368560876, 0x1e0ffff0 },
+    {  20160, "e19b119f4a633d89320d502e7c05b88d083acdff3b4bd40efcdca54b25f6cb2c", 1369548217, 0x1c22de48 },
+    { 201600, "587ebf9221782de5e5669317f863cb56391c463195dca97e19d4e8ea6c71bd19", 1410984358, 0x1c046923 },
+    { 443520, "d462b7f5888a4588d630c99a9c261e7ccc54f402b142ce1c4d51b5cb26358363", 1467199941, 0x1c1b8327 },
+    { 564000, "9d67ce445d6b513074ef061066bb331871901b953b3bdeaa4dc0a4043cf189f8", 1485839612, 0x1c0c6b9e },
+    { 690000, "93c7b08b99b3838110e538766a166f27607f2d5fda7ee0c7745525db7cfcea4f", 1504615272, 0x1c021e2b }
+
 };
 
 static const char *dns_seeds[] = {
-    "seed.breadwallet.com.", "seed.bitcoin.sipa.be.", "dnsseed.bluematt.me.", "dnsseed.bitcoin.dashjr.org.",
-    "seed.bitcoinstats.com.", "bitseed.xf2.org.", "seed.bitcoin.jonasschnelli.ch."
+    //"dnsseed.gldcoin.com", "seed.gldcoin.com", "vps.gldcoin.com"
+    "192.168.1.10"
 };
 
 #endif
@@ -265,7 +250,7 @@ static const char *dns_seeds[] = {
             return _peers;
 #endif
             // if DNS peer discovery fails, fall back on a hard coded list of peers (list taken from satoshi client)
-            if (_peers.count < PEER_MAX_CONNECTIONS) {
+            /*if (_peers.count < PEER_MAX_CONNECTIONS) {
                 UInt128 addr = { .u32 = { 0, 0, CFSwapInt32HostToBig(0xffff), 0 } };
             
                 for (NSNumber *address in [NSArray arrayWithContentsOfFile:[[NSBundle mainBundle]
@@ -276,7 +261,7 @@ static const char *dns_seeds[] = {
                      timestamp:now - (7*24*60*60 + arc4random_uniform(7*24*60*60))
                      services:SERVICES_NODE_NETWORK | SERVICES_NODE_BLOOM]];
                 }
-            }
+            }*/
             
             [self sortPeers];
         }
@@ -593,7 +578,7 @@ static const char *dns_seeds[] = {
         if (completion) {
             [[BREventManager sharedEventManager] saveEvent:@"peer_manager:not_signed"];
             completion([NSError errorWithDomain:@"BreadWallet" code:401 userInfo:@{NSLocalizedDescriptionKey:
-                        NSLocalizedString(@"bitcoin transaction not signed", nil)}]);
+                        NSLocalizedString(@"goldcoin transaction not signed", nil)}]);
         }
         
         return;
@@ -602,7 +587,7 @@ static const char *dns_seeds[] = {
         if (completion) {
             [[BREventManager sharedEventManager] saveEvent:@"peer_manager:not_connected"];
             completion([NSError errorWithDomain:@"BreadWallet" code:-1009 userInfo:@{NSLocalizedDescriptionKey:
-                        NSLocalizedString(@"not connected to the bitcoin network", nil)}]);
+                        NSLocalizedString(@"not connected to the goldcoin network", nil)}]);
         }
         
         return;
@@ -767,7 +752,7 @@ static const char *dns_seeds[] = {
                     if (success) {
                         p.synced = YES;
                         [self removeUnrelayedTransactions];
-                        [p sendGetaddrMessage]; // request a list of other bitcoin peers
+                        [p sendGetaddrMessage]; // request a list of other goldcoin peers
                         
                         dispatch_async(dispatch_get_main_queue(), ^{
                             [[NSNotificationCenter defaultCenter]
@@ -1023,7 +1008,7 @@ static const char *dns_seeds[] = {
                 if (! success) return;
                 peer.synced = YES;
                 [self removeUnrelayedTransactions];
-                [peer sendGetaddrMessage]; // request a list of other bitcoin peers
+                [peer sendGetaddrMessage]; // request a list of other goldcoin peers
                 
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [[NSNotificationCenter defaultCenter] postNotificationName:BRPeerManagerTxStatusNotification
@@ -1348,7 +1333,7 @@ static const char *dns_seeds[] = {
     block.height = prev.height + 1;
     txTime = block.timestamp/2 + prev.timestamp/2;
 
-    if ((block.height % BLOCK_DIFFICULTY_INTERVAL) == 0) { // hit a difficulty transition, find previous transition time
+    /*if ((block.height % BLOCK_DIFFICULTY_INTERVAL) == 0) { // hit a difficulty transition, find previous transition time
         BRMerkleBlock *b = block;
 
         for (uint32_t i = 0; b && i < BLOCK_DIFFICULTY_INTERVAL; i++) {
@@ -1376,12 +1361,12 @@ static const char *dns_seeds[] = {
                 [self.blocks removeObjectForKey:uint256_obj(b.blockHash)];
             }
         }
-    }
+    }*/
 
     // verify block difficulty
-    if (! [block verifyDifficultyFromPreviousBlock:prev andTransitionTime:transitionTime]) {
-        NSLog(@"%@:%d relayed block with invalid difficulty target %x, blockHash: %@", peer.host, peer.port,
-              block.target, blockHash);
+    if (![self verifyDifficultyFromPreviousBlockGLD:prev nextBlock:block]) {
+        NSLog(@"%@:%d relayed block with invalid difficulty target at height %d, %x, blockHash: %@", peer.host, peer.port,
+              block.height, block.target, blockHash);
         [self peerMisbehavin:peer];
         return;
     }
@@ -1570,6 +1555,741 @@ static const char *dns_seeds[] = {
 {
     if (buttonIndex == alertView.cancelButtonIndex) return;
     [self rescan];
+}
+
+
+UInt256 setCompact(int32_t nCompact)
+{
+    int nSize = nCompact >> 24;
+    UInt256 nWord = UINT256_ZERO;
+    nWord.u32[0] = nCompact & 0x007fffff;
+    if (nSize <= 3) {
+        nWord = shiftRight(nWord, 8 * (3 - nSize));
+    } else {
+        nWord = shiftLeft(nWord, 8 * (nSize - 3));
+    }
+    return nWord;
+}
+
+uint8_t bits(UInt256 number)
+{
+    for (int pos = 8 - 1; pos >= 0; pos--) {
+        if (number.u32[pos]) {
+            for (int bits = 31; bits > 0; bits--) {
+                if (number.u32[pos] & 1 << bits)
+                    return 32 * pos + bits + 1;
+            }
+            return 32 * pos + 1;
+        }
+    }
+    return 0;
+}
+
+int32_t getCompact(UInt256 number)
+{
+    int nSize = (bits(number) + 7) / 8;
+    uint32_t nCompact = 0;
+    if (nSize <= 3) {
+        nCompact = number.u32[0] << 8 * (3 - nSize);
+    } else {
+        UInt256 bn = shiftRight(number, 8 * (nSize - 3));
+        nCompact = bn.u32[0];
+    }
+    // The 0x00800000 bit denotes the sign.
+    // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
+    if (nCompact & 0x00800000) {
+        nCompact >>= 8;
+        nSize++;
+    }
+    assert((nCompact & ~0x007fffff) == 0);
+    assert(nSize < 256);
+    nCompact |= nSize << 24;
+    return nCompact;
+}
+
+UInt256 add(UInt256 a, UInt256 b) {
+    uint64_t carry = 0;
+    UInt256 r = UINT256_ZERO;
+    for (int i = 0; i < 8; i++) {
+        uint64_t sum = (uint64_t)a.u32[i] + (uint64_t)b.u32[i] + carry;
+        r.u32[i] = (uint32_t)sum;
+        carry = sum >> 32;
+    }
+    return r;
+}
+
+UInt256 addOne(UInt256 a) {
+    UInt256 r = ((UInt256) { .u64 = { 1, 0, 0, 0 } });
+    return add(a, r);
+}
+
+UInt256 neg(UInt256 a) {
+    UInt256 r = UINT256_ZERO;
+    for (int i = 0; i < 4; i++) {
+        r.u64[i] = ~a.u64[i];
+    }
+    return r;
+}
+
+UInt256 subtract(UInt256 a, UInt256 b) {
+    return add(a,addOne(neg(b)));
+}
+
+UInt256 shiftLeft(UInt256 a, uint8_t bits) {
+    UInt256 r = UINT256_ZERO;
+    int k = bits / 64;
+    bits = bits % 64;
+    for (int i = 0; i < 4; i++) {
+        if (i + k + 1 < 4 && bits != 0)
+            r.u64[i + k + 1] |= (a.u64[i] >> (64 - bits));
+        if (i + k < 4)
+            r.u64[i + k] |= (a.u64[i] << bits);
+    }
+    return r;
+}
+
+UInt256 shiftRight(UInt256 a, uint8_t bits) {
+    UInt256 r = UINT256_ZERO;
+    int k = bits / 64;
+    bits = bits % 64;
+    for (int i = 0; i < 4; i++) {
+        if (i - k - 1 >= 0 && bits != 0)
+            r.u64[i - k - 1] |= (a.u64[i] << (64 - bits));
+        if (i - k >= 0)
+            r.u64[i - k] |= (a.u64[i] >> bits);
+    }
+    return r;
+}
+
+UInt256 divide (UInt256 a,UInt256 b)
+{
+    UInt256 div = b;     // make a copy, so we can shift.
+    UInt256 num = a;     // make a copy, so we can subtract.
+    UInt256 r = UINT256_ZERO;                  // the quotient.
+    int num_bits = bits(num);
+    int div_bits = bits(div);
+    assert (div_bits != 0);
+    if (div_bits > num_bits) // the result is certainly 0.
+        return r;
+    int shift = num_bits - div_bits;
+    div = shiftLeft(div, shift); // shift so that div and nun align.
+    while (shift >= 0) {
+        if (uint256_supeq(num,div)) {
+            num = subtract(num,div);
+            r.u32[shift / 32] |= (1 << (shift & 31)); // set a bit of the result.
+        }
+        div = shiftRight(div, 1); // shift back.
+        shift--;
+    }
+    // num now contains the remainder of the division.
+    return r;
+}
+
+UInt256 multiplyThis32 (UInt256 a,uint32_t b)
+{
+    uint64_t carry = 0;
+    for (int i = 0; i < 8; i++) {
+        uint64_t n = carry + (uint64_t)b * (uint64_t)a.u32[i];
+        a.u32[i] = n & 0xffffffff;
+        carry = n >> 32;
+    }
+    return a;
+}
+
+#define MAX_PROOF_OF_WORK 0x1e0fffffu   // highest value for difficulty target (higher values are less difficult)
+#define julyFork 45000
+#define novemberFork  103000
+#define novemberFork2  118800
+#define mayFork 248000
+#define febFork  372000
+#define octoberFork  100000
+
+#define julyFork2  251230
+
+int compare_int64(const void *a,const void *b) {
+    int64_t *x = (int64_t *) a;
+    int64_t *y = (int64_t *) b;
+    int64_t diff =  *x - *y;
+    if(diff > 0)
+        return 1;
+    if(diff < 0)
+        return -1;
+    return 0;
+}
+
+- (BOOL)verifyDifficultyFromPreviousBlockGLD:(BRMerkleBlock *)pindexLast nextBlock:(BRMerkleBlock *)block
+{
+    //return next->_target == GetNextWorkRequired(previous, next, manager);
+    
+    static const int64_t nTargetTimespan = (2 * 60 * 60);// Difficulty changes every 60 blocks
+    static const int64_t nTargetSpacing = 2.0 * 60;
+    //Todo:: Clean this mess up.. -akumaburn
+    unsigned int nProofOfWorkLimit = MAX_PROOF_OF_WORK;
+    UInt256 bnNew = UINT256_ZERO;
+    
+    // Genesis block
+    if (pindexLast == NULL)
+        return nProofOfWorkLimit == block.target;
+    
+    // FeatherCoin difficulty adjustment protocol switch
+    static const int nDifficultySwitchHeight = 21000;
+    int nHeight = pindexLast.height + 1;
+    bool fNewDifficultyProtocol = (nHeight >= nDifficultySwitchHeight);
+    
+    //julyFork2 whether or not we had a massive difficulty fall authorized
+    bool didHalfAdjust = false;
+    
+    //msendheaoved to solve scope issues
+    long long averageTime = 120;
+    
+    if (nHeight < julyFork) {
+        //if(!hardForkedJuly) {
+        int64_t nTargetTimespan2 = (7 * 24 * 60 * 60) / 8;
+        int64_t nTargetSpacing2 = 2.5 * 60;
+        
+        int64_t nTargetTimespan2Current = fNewDifficultyProtocol ? nTargetTimespan2 : (nTargetTimespan2 * 4);
+        int64_t nInterval = nTargetTimespan2Current / nTargetSpacing2;
+        
+        // Only change once per interval, or at protocol switch height
+        if ((nHeight % nInterval != 0) &&
+            (nHeight != nDifficultySwitchHeight))
+        {
+            // Special difficulty rule for testnet:
+            /*if (fTestNet)
+             {
+             // If the new block's timestamp is more than 2* 10 minutes
+             // then allow mining of a min-difficulty block.
+             if (pblock->_timestamp > pindexLast->_timestamp + nTargetSpacing2 * 2)
+             return nProofOfWorkLimit;
+             else
+             {
+             // Return the last non-special-min-difficulty-rules-block
+             const BRMerkleBlock* pindex = pindexLast;
+             while (pindex->pprev && pindex->nHeight % nInterval != 0 && pindex->nBits == nProofOfWorkLimit)
+             pindex = pindex->pprev;
+             return pindex->nBits;
+             }
+             }*/
+            
+            return pindexLast.target == block.target;
+        }
+        
+        // GoldCoin (GLD): This fixes an issue where a 51% attack can change difficulty at will.
+        // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+        int64_t blockstogoback = nInterval - 1;
+        if ((pindexLast.height + 1) != nInterval)
+            blockstogoback = nInterval;
+        BRMerkleBlock* pindexFirst = pindexLast;
+        { // hit a difficulty transition, find previous transition time
+            BRMerkleBlock *b = pindexLast;
+            
+            for (uint32_t i = 0; b && i < blockstogoback; i++) {
+                b = self.blocks[uint256_obj(b.prevBlock)];
+                if(b == nil)
+                    return YES; //Let it go, not enough blocks
+            }
+            
+            [[BRMerkleBlockEntity context] performBlock:^{ // save transition blocks to core data immediately
+                @autoreleasepool {
+                    BRMerkleBlockEntity *e = [BRMerkleBlockEntity objectsMatching:@"blockHash == %@",
+                                              [NSData dataWithBytes:b.blockHash.u8 length:sizeof(UInt256)]].lastObject;
+                    
+                    if (! e) e = [BRMerkleBlockEntity managedObject];
+                    [e setAttributesFromBlock:b];
+                }
+                
+                [BRMerkleBlockEntity saveContext]; // persist core data to disk
+            }];
+            
+            //transitionTime = b.timestamp;
+            pindexFirst = b;
+            
+            while (b) { // free up some memory
+                b = self.blocks[uint256_obj(b.prevBlock)];
+                
+                if (b && (b.height % nInterval) != 0) {
+                    [self.blocks removeObjectForKey:uint256_obj(b.blockHash)];
+                }
+            }
+        }
+        
+        // Limit adjustment step
+        int64_t nActualTimespan = pindexLast.timestamp - pindexFirst.timestamp;
+        //printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
+        int64_t nActualTimespanMax = fNewDifficultyProtocol ? ((nTargetTimespan2Current * 99) / 70) : (nTargetTimespan2Current * 4);
+        int64_t nActualTimespanMin = fNewDifficultyProtocol ? ((nTargetTimespan2Current * 70) / 99) : (nTargetTimespan2Current / 4);
+        if (nActualTimespan < nActualTimespanMin)
+            nActualTimespan = nActualTimespanMin;
+        if (nActualTimespan > nActualTimespanMax)
+            nActualTimespan = nActualTimespanMax;
+        // Retarget
+        bnNew = setCompact(pindexLast.target);
+        bnNew = multiplyThis32(bnNew, (int32_t)nActualTimespan);
+        bnNew = divide(bnNew, ((UInt256) { .u64 = { nTargetTimespan2Current, 0, 0, 0 } }));
+        
+        //if (bnNew > bnProofOfWorkLimit)
+        //    bnNew = bnProofOfWorkLimit;
+        
+        /// debug print
+        //printf("GetNextWorkRequired RETARGET\n");
+        //printf("nTargetTimespan2 = %"PRI64d"    nActualTimespan = %"PRI64d"\n", nTargetTimespan2Current, nActualTimespan);
+        //printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
+        //printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
+        return getCompact(bnNew) == block.target;
+    } else if (nHeight > novemberFork) {
+        BOOL hardForkedNovember = true;
+        
+        int64_t nTargetTimespanCurrent = fNewDifficultyProtocol ? nTargetTimespan : (nTargetTimespan * 4);
+        int64_t nInterval = nTargetTimespanCurrent / nTargetSpacing;
+        
+        // Only change once per interval, or at protocol switch height
+        // After julyFork2 we change difficulty at every block.. so we want this only to happen before that..
+        if ((nHeight % nInterval != 0) &&
+            (nHeight != nDifficultySwitchHeight) && (nHeight <= julyFork2))
+        {
+            // Special difficulty rule for testnet:
+            /*if (fTestNet)
+            {
+                // If the new block's timestamp is more than 2* 10 minutes
+                // then allow mining of a min-difficulty block.
+                if (pblock->nTime > pindexLast->nTime + nTargetSpacing * 2)
+                    return nProofOfWorkLimit;
+                else
+                {
+                    // Return the last non-special-min-difficulty-rules-block
+                    const CBlockIndex* pindex = pindexLast;
+                    while (pindex->pprev && pindex->nHeight % nInterval != 0 && pindex->nBits == nProofOfWorkLimit)
+                        pindex = pindex->pprev;
+                    return pindex->nBits;
+                }
+            }*/
+            
+            return pindexLast.target == block.target;
+        }
+        
+        // GoldCoin (GLD): This fixes an issue where a 51% attack can change difficulty at will.
+        // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+        BRMerkleBlock* pindexFirst = pindexLast;
+        { // hit a difficulty transition, find previous transition time
+                    }
+        
+        BRMerkleBlock * tblock1 = pindexLast;//We want to copy pindexLast to avoid changing it accidentally
+        BRMerkleBlock * tblock2 = tblock1;
+        
+        //std::vector<int64_t> last60BlockTimes;
+        int64_t last60BlockTimes[60];
+        int count = 0;
+        // Limit adjustment step
+        //We need to set this in a way that reflects how fast blocks are actually being solved..
+        //First we find the last 60 blocks and take the time between blocks
+        //That gives us a list of 59 time differences
+        //Then we take the median of those times and multiply it by 60 to get our actualtimespan
+        while (count < 60) {
+            last60BlockTimes[count] = tblock2.timestamp;
+            //if (tblock2->pprev) //should always be so
+            //    tblock2 = tblock2->pprev;
+         
+            //[last60BlockTimes addObject:tblock2.timestamp]
+            //for (uint32_t i = 0; b && i < nInterval; i++) {
+                tblock2 = self.blocks[uint256_obj(tblock2.prevBlock)];
+                if(tblock2 == nil)
+                    return YES; // Let it go, we don't have enough blocks.
+            //}
+            count++;
+        }
+        //std::vector<int64_t> last59TimeDifferences;
+        int64_t last59TimeDifferences[59];
+        int xy = 0;
+        while (xy < 59) {
+            last59TimeDifferences[xy] = (llabs(last60BlockTimes[xy] - last60BlockTimes[xy + 1]));
+            xy++;
+        }
+        
+        qsort(last59TimeDifferences, 59, sizeof(int64_t), compare_int64);
+        
+        //printf("  Median Time between blocks is: %" PRI64d" \n", last59TimeDifferences[29]);
+        int64_t nActualTimespan = llabs((last59TimeDifferences[29]));
+        int64_t medTime = nActualTimespan;
+        
+        if (nHeight > mayFork) {
+            
+            
+            //Difficulty Fix here for case where average time between blocks becomes far longer than 2 minutes, even though median time is close to 2 minutes.
+            //Uses the last 120 blocks(Should be 4 hours) for calculating
+            
+            //printf(" GetNextWorkRequired(): May Fork mode \n");
+            
+            BRMerkleBlock * tblock1 = pindexLast;//We want to copy pindexLast to avoid changing it accidentally
+            BRMerkleBlock* tblock2 = tblock1;
+            /*
+            std::vector<int64_t> last120BlockTimes;
+            // Limit adjustment step
+            //We need to set this in a way that reflects how fast blocks are actually being solved..
+            //First we find the last 120 blocks and take the time between blocks
+            //That gives us a list of 119 time differences
+            //Then we take the average of those times and multiply it by 60 to get our actualtimespan
+            while (last120BlockTimes.size() < 120) {
+                last120BlockTimes.push_back(tblock2->GetBlockTime());
+                if (tblock2->pprev) //should always be so
+                    tblock2 = tblock2->pprev;
+            }
+            std::vector<int64_t> last119TimeDifferences;
+            
+            int xy = 0;
+            while (last119TimeDifferences.size() != 119) {
+                if (xy == 119) {
+                    printf(" GetNextWorkRequired(): This shouldn't have happened 2 \n");
+                    break;
+                }
+                last119TimeDifferences.push_back(llabs(last120BlockTimes[xy] - last120BlockTimes[xy + 1]));
+                xy++;
+            }
+            */
+            int64_t last120BlockTimes[120];
+            int count = 0;
+            // Limit adjustment step
+            //We need to set this in a way that reflects how fast blocks are actually being solved..
+            //First we find the last 60 blocks and take the time between blocks
+            //That gives us a list of 59 time differences
+            //Then we take the median of those times and multiply it by 60 to get our actualtimespan
+            while (count < 120) {
+                
+                //if (tblock2->pprev) //should always be so
+                //    tblock2 = tblock2->pprev;
+                //BRMerkleBlock *b = tblock2;
+                //[last60BlockTimes addObject:tblock2.timestamp]
+                last120BlockTimes[count] = tblock2.timestamp;
+                //for (uint32_t i = 0; tblock2 && i < nInterval; i++) {
+                    tblock2 = self.blocks[uint256_obj(tblock2.prevBlock)];
+                if(tblock2 == nil)
+                    return YES; // Let it go, we don't have enough blocks.
+             //   }
+                count++;
+            }
+            //std::vector<int64_t> last59TimeDifferences;
+            int64_t last119TimeDifferences[119];
+            int xy = 0;
+            while (xy < 119) {
+                last119TimeDifferences[xy] = (llabs(last120BlockTimes[xy] - last120BlockTimes[xy + 1]));
+                xy++;
+            }
+            
+            //qsort(last119TimeDifferences, 119, sizeof(int64_t), compare_int64);
+            int64_t total = 0;
+            
+            for (int x = 0; x < 119; x++) {
+                int64_t timeN = last119TimeDifferences[x];
+                //printf(" GetNextWorkRequired(): Current Time difference is: %"PRI64d" \n",timeN);
+                total += timeN;
+            }
+            
+            averageTime = total / 119;
+            
+            
+            //printf(" GetNextWorkRequired(): Average time between blocks over the last 120 blocks is: %"PRI64d" \n", averageTime);
+            /*printf(" GetNextWorkRequired(): Total Time (over 119 time differences) is: %"PRI64d" \n",total);
+             printf(" GetNextWorkRequired(): First Time (over 119 time differences) is: %"PRI64d" \n",last119TimeDifferences[0]);
+             printf(" GetNextWorkRequired(): Last Time (over 119 time differences) is: %"PRI64d" \n",last119TimeDifferences[118]);
+             printf(" GetNextWorkRequired(): Last Time is: %"PRI64d" \n",last120BlockTimes[119]);
+             printf(" GetNextWorkRequired(): 2nd Last Time is: %"PRI64d" \n",last120BlockTimes[118]);
+             printf(" GetNextWorkRequired(): First Time is: %"PRI64d" \n",last120BlockTimes[0]);
+             printf(" GetNextWorkRequired(): 2nd Time is: %"PRI64d" \n",last120BlockTimes[1]);*/
+            
+            if (nHeight <= julyFork2) {
+                //If the average time between blocks exceeds or is equal to 3 minutes then increase the med time accordingly
+                if (averageTime >= 180) {
+                    printf(" \n Average Time between blocks is too high.. Attempting to Adjust.. \n ");
+                    medTime = 130;
+                } else if (averageTime >= 108 && medTime < 120) {
+                    //If the average time between blocks is more than 1.8 minutes and medTime is less than 120 seconds (which would ordinarily prompt an increase in difficulty)
+                    //limit the stepping to something reasonable(so we don't see massive difficulty spike followed by miners leaving in these situations).
+                    medTime = 110;
+                    printf(" \n Medium Time between blocks is too low compared to average time.. Attempting to Adjust.. \n ");
+                }
+            } else {//julyFork2 changes here
+                
+                //Calculate difficulty of previous block as a double
+                /*int nShift = (pindexLast->nBits >> 24) & 0xff;
+                 double dDiff =
+                 (double)0x0000ffff / (double)(pindexLast->nBits & 0x00ffffff);
+                 while (nShift < 29)
+                 {
+                 dDiff *= 256.0;
+                 nShift++;
+                 }
+                 while (nShift > 29)
+                 {
+                 dDiff /= 256.0;
+                 nShift--;
+                 } */
+                
+                //int64_t hashrate = (int64_t)(dDiff * pow(2.0,32.0))/((medTime > averageTime)?averageTime:medTime);
+                
+                medTime = (medTime > averageTime) ? averageTime : medTime;
+                
+                if (averageTime >= 180 && last119TimeDifferences[0] >= 1200 && last119TimeDifferences[1] >= 1200) {
+                    didHalfAdjust = true;
+                    medTime = 240;
+                }
+                
+            }
+        }
+        
+        //Fixes an issue where median time between blocks is greater than 120 seconds and is not permitted to be lower by the defence system
+        //Causing difficulty to drop without end
+        
+        if (nHeight > novemberFork2) {
+            if (medTime >= 120) {
+                //Check to see whether we are in a deadlock situation with the 51% defense system
+                printf("  Checking for DeadLocks \n");
+                int numTooClose = 0;
+                int index = 1;
+                while (index != 55) {
+                    if (llabs(last60BlockTimes[60 - index] - last60BlockTimes[60 - (index + 5)]) == 600) {
+                        numTooClose++;
+                    }
+                    index++;
+                }
+                
+                if (numTooClose > 0) {
+                    //We found 6 blocks that were solved in exactly 10 minutes
+                    //Averaging 1.66 minutes per block
+                    printf(" \n DeadLock detected and fixed - Difficulty Increased to avoid bleeding edge of defence system \n");
+                    
+                    if (nHeight > julyFork2) {
+                        medTime = 119;
+                    } else {
+                        medTime = 110;
+                    }
+                } else {
+                    printf(" \n DeadLock not detected. \n");
+                }
+                
+                
+            }
+        }
+        
+        
+        if (nHeight > julyFork2) {
+            //216 == (int64_t) 180.0/100.0 * 120
+            //122 == (int64_t) 102.0/100.0 * 120 == 122.4
+            if (averageTime > 216 || medTime > 122) {
+                if (didHalfAdjust) {
+                    // If the average time between blocks was
+                    // too high.. allow a dramatic difficulty
+                    // fall..
+                    medTime = (int64_t)(120 * 142.0 / 100.0);
+                } else {
+                    // Otherwise only allow a 120/119 fall per block
+                    // maximum.. As we now adjust per block..
+                    // 121 == (int64_t) 120 * 120.0/119.0
+                    medTime = 121;
+                }
+            }
+            // 117 -- (int64_t) 120.0 * 98.0/100.0
+            else if (averageTime < 117 || medTime < 117)  {
+                // If the average time between blocks is within 2% of target
+                // value
+                // Or if the median time stamp between blocks is within 2% of
+                // the target value
+                // Limit diff increase to 2%
+                medTime = 117;
+            }
+            nActualTimespan = medTime * 60;
+        } else {
+            
+            nActualTimespan = medTime * 60;
+            
+            //printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
+            int64_t nActualTimespanMax = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 99) / 70) : (nTargetTimespanCurrent * 4);
+            int64_t nActualTimespanMin = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 70) / 99) : (nTargetTimespanCurrent / 4);
+            if (nActualTimespan < nActualTimespanMin)
+                nActualTimespan = nActualTimespanMin;
+            if (nActualTimespan > nActualTimespanMax)
+                nActualTimespan = nActualTimespanMax;
+            
+        }
+        
+        
+        if (nHeight > julyFork2) {
+            BRMerkleBlock * tblock11 = pindexLast;//We want to copy pindexLast to avoid changing it accidentally
+            BRMerkleBlock * tblock22 = tblock11;
+            
+            // We want to limit the possible difficulty raise/fall over 60 and 240 blocks here
+            // So we get the difficulty at 60 and 240 blocks ago
+            
+            int64_t nbits60ago = 0;
+            int64_t nbits240ago = 0;
+            int counter = 0;
+            //Note: 0 is the current block, we want 60 past current
+            while (counter <= 240) {
+                if (counter == 60) {
+                    nbits60ago = tblock22.target;
+                } else if (counter == 240) {
+                    nbits240ago = tblock22.target;
+                }
+                //if (tblock22->pprev) //should always be so
+                //    tblock22 = tblock22->pprev;
+                
+                tblock22 = self.blocks[uint256_obj(tblock22.prevBlock)];
+                if(!tblock22)
+                    return YES;
+                counter++;
+            }
+            
+            while (tblock22) { // free up some memory
+                tblock22 = self.blocks[uint256_obj(tblock22.prevBlock)];
+                
+                if (tblock22 && (tblock22.height % 240) != 0) {
+                    [self.blocks removeObjectForKey:uint256_obj(tblock22.blockHash)];
+                }
+            }
+            
+            //Now we get the old targets
+            UInt256 bn60ago = UINT256_ZERO, bn240ago = UINT256_ZERO, bnLast = UINT256_ZERO;
+            bn60ago = setCompact(nbits60ago);
+            bn240ago = setCompact(nbits240ago);
+            bnLast = setCompact(pindexLast.target);
+            
+            //Set the new target
+            bnNew = setCompact(pindexLast.target);
+            bnNew = multiplyThis32(bnNew, nActualTimespan);
+            bnNew = divide(bnNew, ((UInt256) { .u64 = { nTargetTimespanCurrent, 0, 0, 0 } }));
+            
+            
+            //Now we have the difficulty at those blocks..
+            
+            // Set a floor on difficulty decreases per block(20% lower maximum
+            // than the previous block difficulty).. when there was no halfing
+            // necessary.. 10/8 == 1.0/0.8
+            bnLast = multiplyThis32(bnLast, 10);
+            bnLast = divide(bnLast, ((UInt256) { .u64 = { 8, 0, 0, 0 } }));;
+            
+            if (!didHalfAdjust && uint256_sup(bnNew, bnLast)) {
+                bnNew = setCompact(getCompact(bnLast));
+            }
+            
+            bnLast = multiplyThis32(bnLast, 8);
+            bnLast = divide(bnLast, ((UInt256) { .u64 = { 10, 0, 0, 0 } }));;
+            
+            // Set ceilings on difficulty increases per block
+            
+            //1.0/1.02 == 100/102
+            bn60ago = multiplyThis32(bn60ago, 100);
+            bn60ago = divide(bn60ago, ((UInt256) { .u64 = { 102, 0, 0, 0 } }));
+            
+            if (uint256_sup(bn60ago, bnNew)) {
+                bnNew = setCompact(getCompact(bn60ago));
+            }
+            
+            bn60ago = multiplyThis32(bn60ago,102);
+            bn60ago = divide(bn60ago, ((UInt256) { .u64 = { 100, 0, 0, 0 } }));
+            
+            //1.0/(1.02*4) ==  100 / 408
+            
+            bn240ago = multiplyThis32(bn240ago,100);
+            bn240ago = divide(bn240ago, ((UInt256) { .u64 = { 408, 0, 0, 0 } }));
+            
+            if (uint256_sup(bn240ago, bnNew)) {
+                bnNew = setCompact(getCompact(bn240ago));;
+            }
+            
+            bn240ago = multiplyThis32(bn240ago, 408);
+            bn240ago = divide(bn240ago, ((UInt256) { .u64 = { 100, 0, 0, 0 } }));
+            
+            
+        } else {
+            // Retarget
+            bnNew = setCompact(pindexLast.target);
+            bnNew = multiplyThis32(bnNew, nActualTimespan);
+            bnNew = divide(bnNew, ((UInt256) { .u64 = { nTargetTimespanCurrent, 0, 0, 0 } }));
+        }
+        
+        //Sets a ceiling on highest target value (lowest possible difficulty)
+        if (getCompact(bnNew) > nProofOfWorkLimit)
+            bnNew = setCompact(nProofOfWorkLimit);
+        
+        /// debug print
+        printf("GetNextWorkRequired RETARGET\n");
+        printf("nTargetTimespan = %d    nActualTimespan = %d\n", (int)nTargetTimespanCurrent, (int)nActualTimespan);
+        printf("Before: %08x  \n", pindexLast.target);
+        printf("After:  %08x  \n", getCompact(bnNew));
+    } else {
+        int hardForkedJuly = true;
+        int64_t nTargetTimespanCurrent = fNewDifficultyProtocol ? nTargetTimespan : (nTargetTimespan * 4);
+        int64_t nInterval = nTargetTimespanCurrent / nTargetSpacing;
+#if BITCOIN_TESTNET
+        int fTestnet = TRUE;
+#else
+        int fTestNet = FALSE;
+#endif
+        // Only change once per interval, or at protocol switch height
+        if ((nHeight % nInterval != 0) &&
+            (nHeight != nDifficultySwitchHeight || fTestNet))
+        {
+#if BITCOIN_TESTNET
+            // Special difficulty rule for testnet:
+            {
+                // If the new block's timestamp is more than 2* 10 minutes
+                // then allow mining of a min-difficulty block.
+                if (pblock->nTime > pindexLast->nTime + nTargetSpacing * 2)
+                    return nProofOfWorkLimit == block.target;
+                else
+                {
+                    // Return the last non-special-min-difficulty-rules-block
+                    const BRMerkleBlock* pindex = pindexLast;
+                    while (pindex.height % nInterval != 0 && pindex.target == nProofOfWorkLimit)
+                        pindex = self.blocks[uint256_obj(pindex.prevBlock);
+                    
+
+                    return pindex.target == block.target;
+                    
+                }
+            }
+#endif
+            
+            return pindexLast.target == block.target;
+        }
+        
+        // GoldCoin (GLD): This fixes an issue where a 51% attack can change difficulty at will.
+        // Go back the full period unless it's the first retarget after genesis. Code courtesy of Art Forz
+        int blockstogoback = nInterval - 1;
+        if ((pindexLast.height + 1) != nInterval)
+            blockstogoback = nInterval;
+        const BRMerkleBlock* pindexFirst = pindexLast;
+        for (int i = 0; pindexFirst && i < blockstogoback; i++)
+        {
+            pindexFirst = self.blocks[uint256_obj(pindexFirst.prevBlock)];
+            if(!pindexFirst)
+                return YES;
+        
+        }
+        assert(pindexFirst);
+        
+        // Limit adjustment step
+        int64_t nActualTimespan = pindexLast.timestamp - pindexFirst.timestamp;
+        //printf("  nActualTimespan = %"PRI64d"  before bounds\n", nActualTimespan);
+        int64_t nActualTimespanMax = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 99) / 70) : (nTargetTimespanCurrent * 4);
+        int64_t nActualTimespanMin = fNewDifficultyProtocol ? ((nTargetTimespanCurrent * 70) / 99) : (nTargetTimespanCurrent / 4);
+        if (nActualTimespan < nActualTimespanMin)
+            nActualTimespan = nActualTimespanMin;
+        if (nActualTimespan > nActualTimespanMax)
+            nActualTimespan = nActualTimespanMax;
+        // Retarget
+        bnNew = setCompact(pindexLast.target);
+        bnNew = multiplyThis32(bnNew,nActualTimespan);
+        bnNew = divide(bnNew, ((UInt256) { .u64 = { nTargetTimespanCurrent, 0, 0, 0 } }));
+        
+        if (uint256_sup(bnNew, setCompact(nProofOfWorkLimit)))
+            bnNew = setCompact(nProofOfWorkLimit);
+        
+        /// debug print
+        //printf("GetNextWorkRequired RETARGET\n");
+        //printf("nTargetTimespan = %"PRI64d"    nActualTimespan = %"PRI64d"\n", nTargetTimespanCurrent, nActualTimespan);
+        //printf("Before: %08x  %s\n", pindexLast->nBits, CBigNum().SetCompact(pindexLast->nBits).getuint256().ToString().c_str());
+        //printf("After:  %08x  %s\n", bnNew.GetCompact(), bnNew.getuint256().ToString().c_str());
+    }
+    return getCompact(bnNew) == block.target;
 }
 
 @end
