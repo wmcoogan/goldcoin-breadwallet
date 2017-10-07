@@ -718,6 +718,7 @@ open class BRReplicatedKVStore: NSObject {
     
     // ensure the sqlite3 error code is an acceptable one (or that its the one you provide as `r`
     // this MUST be called from within the dbQueue
+    @available(iOS 8.2, *)
     fileprivate func checkErr(_ e: Int32, s: String, r: Int32 = SQLITE_NULL) throws {
         if (r == SQLITE_NULL && (e != SQLITE_OK && e != SQLITE_DONE && e != SQLITE_ROW))
             && (e != SQLITE_NULL && e != r) {
