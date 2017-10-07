@@ -310,7 +310,7 @@ int BRSecp256k1PointMul(BRECPoint *p, const UInt256 *i)
     return r;
 }
 
-// Pieter Wuille's compact signature encoding used for bitcoin message signing
+// Pieter Wuille's compact signature encoding used for goldcoin message signing
 // to verify a compact signature, recover a public key from the signature and verify that it matches the signer's pubkey
 - (NSData *)compactSign:(UInt256)md
 {
