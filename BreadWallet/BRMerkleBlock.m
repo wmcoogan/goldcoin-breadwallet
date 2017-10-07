@@ -26,13 +26,23 @@
 #import "BRMerkleBlock.h"
 #import "NSMutableData+Bitcoin.h"
 #import "NSData+Bitcoin.h"
+#import "BRPeerManager.h"
 
 #define MAX_TIME_DRIFT    (2*60*60)     // the furthest in the future a block is allowed to be timestamped
-#define MAX_PROOF_OF_WORK 0x1d00ffffu   // highest value for difficulty target (higher values are less difficult)
+#define MAX_PROOF_OF_WORK 0x1e0fffffu   // highest value for difficulty target (higher values are less difficult)
 #define TARGET_TIMESPAN   (14*24*60*60) // the targeted timespan between difficulty target adjustments
 
+#define julyFork 45000
+#define novemberFork  103000
+#define novemberFork2  118800
+#define mayFork 248000
+#define febFork  372000
+#define octoberFork  100000
+
+#define julyFork2  251230
+
 // from https://en.bitcoin.it/wiki/Protocol_specification#Merkle_Trees
-// Merkle trees are binary trees of hashes. Merkle trees in bitcoin use a double SHA-256, the SHA-256 hash of the
+// Merkle trees are binary trees of hashes. Merkle trees in goldcoin use a double SHA-256, the SHA-256 hash of the
 // SHA-256 hash of something. If, when forming a row in the tree (other than the root of the tree), it would have an odd
 // number of elements, the final double-hash is duplicated to ensure that the row has an even number of hashes. First
 // form the bottom row of the tree with the ordered double-SHA-256 hashes of the byte streams of the transactions in the
@@ -117,6 +127,7 @@ inline static int ceil_log2(int x)
     [d appendUInt32:_target];
     [d appendUInt32:_nonce];
     _blockHash = d.SHA256_2;
+    _powHash = d.SCRYPT;
 
     return self;
 }
@@ -183,8 +194,8 @@ totalTransactions:(uint32_t)totalTransactions hashes:(NSData *)hashes flags:(NSD
     else t.u32[0] = CFSwapInt32HostToLittle(target >> (3 - size)*8);
     
     for (int i = sizeof(t)/sizeof(uint32_t) - 1; i >= 0; i--) { // check proof-of-work
-        if (CFSwapInt32LittleToHost(_blockHash.u32[i]) < CFSwapInt32LittleToHost(t.u32[i])) break;
-        if (CFSwapInt32LittleToHost(_blockHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i])) return NO;
+        if (CFSwapInt32LittleToHost(_powHash.u32[i]) < CFSwapInt32LittleToHost(t.u32[i])) break;
+        if (CFSwapInt32LittleToHost(_powHash.u32[i]) > CFSwapInt32LittleToHost(t.u32[i])) return NO;
     }
     
     return YES;
