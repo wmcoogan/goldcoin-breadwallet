@@ -23,6 +23,7 @@
 //  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 //  THE SOFTWARE.
 
+#import "BRKey+BIP38.h"
 #import "NSData+Bitcoin.h"
 #import "NSString+Bitcoin.h"
 
@@ -674,6 +675,13 @@ size_t chacha20Poly1305AEADDecrypt(void *out, size_t outLen, const void *key32, 
     
     MD5(&md5, self.bytes, self.length);
     return md5;
+}
+
+- (UInt256)SCRYPT
+{
+    UInt256 scryptHash;
+    scrypt(self.bytes, self.length, self.bytes, self.length, 1024, 1, 1, &scryptHash, sizeof(scryptHash));
+    return scryptHash;
 }
 
 - (NSData *)reverse
