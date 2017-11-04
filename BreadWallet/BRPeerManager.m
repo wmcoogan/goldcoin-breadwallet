@@ -89,7 +89,7 @@ static const struct { uint32_t height; const char *hash; uint32_t timestamp; uin
 
 static const char *dns_seeds[] = {
     //"dnsseed.gldcoin.com", "seed.gldcoin.com", "vps.gldcoin.com"
-    "192.168.1.10"
+    "168.235.108.149"
 };
 
 #endif
