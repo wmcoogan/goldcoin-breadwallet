@@ -28,7 +28,7 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 	</array>
 	<key>WKCompanionAppBundleIdentifier</key>
-	<string>com.goldcoin.goldwallet</string>
+	<string>com.goldcoin.goldcoinwallet</string>
 	<key>WKWatchKitApp</key>
 	<true/>
 </dict>
