@@ -2434,7 +2434,7 @@ bitpay.com/rates and bittrex.com</string>
 %no-eye%
 
 DO NOT let anyone see your recovery
-phrase or they can spend your bitcoins.
+phrase or they can spend your goldcoins.
 
 
 
@@ -2457,6 +2457,7 @@ Other devices may be infected.
                                 <nil key="highlightedColor"/>
                                 <color key="shadowColor" red="0.0" green="0.0" blue="0.0" alpha="0.14999999999999999" colorSpace="custom" customColorSpace="sRGB"/>
                                 <size key="shadowOffset" width="0.0" height="1"/>
+                                <string key="userLabel">WARNING   %no-eye%  DO NOT let anyone see your recovery phrase or they can spend your goldcoins.    %no-key%  NEVER type your recovery phrase into password managers or elsewhere. Other devices may be infected.</string>
                             </label>
                             <button hidden="YES" opaque="NO" tag="3" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" showsTouchWhenHighlighted="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="efL-Cj-Aho">
                                 <rect key="frame" x="259" y="609" width="116" height="58"/>
@@ -2488,7 +2489,7 @@ Other devices may be infected.
                     <navigationItem key="navigationItem" id="xhy-mj-rkK">
                         <nil key="title"/>
                         <view key="titleView" contentMode="scaleToFill" id="2TI-4e-OIp">
-                            <rect key="frame" x="139" y="13" width="98" height="18"/>
+                            <rect key="frame" x="138.5" y="13" width="98" height="18"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <subviews>
                                 <imageView userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" image="breadwallet-white" translatesAutoresizingMaskIntoConstraints="NO" id="8lh-UZ-tbs">
