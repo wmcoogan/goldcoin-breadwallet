@@ -185,7 +185,7 @@ import Foundation
         // the users btc,mbtc,bits setting
         var mdigits = defs.integer(forKey: "SETTINGS_MAX_DIGITS")
         if mdigits == 0 {
-            mdigits = 2
+            mdigits = 8 // Set 1 GLD as the default
         }
         d["btc_denomination_digits"] = mdigits
         d["local_currency_code"] = manager.localCurrencyCode
