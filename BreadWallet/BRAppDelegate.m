@@ -136,7 +136,7 @@ shouldAllowExtensionPointIdentifier:(NSString *)extensionPointIdentifier
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication
 annotation:(id)annotation
 {
-    if (! [url.scheme isEqual:@"goldcoin"] && ! [url.scheme isEqual:@"bread"]) {
+    if (! [url.scheme isEqual:@"goldcoin"] && ! [url.scheme isEqual:@"gold"]) {
         [[[UIAlertView alloc] initWithTitle:@"Not a goldcoin URL" message:url.absoluteString delegate:nil
           cancelButtonTitle:@"OK" otherButtonTitles:nil] show];
         return NO;
