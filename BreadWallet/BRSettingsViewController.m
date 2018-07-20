@@ -181,7 +181,7 @@
 
 - (IBAction)about:(id)sender
 {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://breadwallet.com/support/"]];
+    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:@"https://www.goldcointalk.org/index.php?topic=3943.0"]];
 }
 
 #if DEBUG
