@@ -6,7 +6,7 @@
 	<string>development</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.goldcoin.goldcoinwallet</string>
+		<string>group.org.goldcoin.goldcoinwallet1</string>
 	</array>
 </dict>
 </plist>
