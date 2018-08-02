@@ -1792,7 +1792,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2EGNN2MXF5;
+				DEVELOPMENT_TEAM = W9SD8ZY353;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1805,7 +1805,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				"OTHER_SWIFT_FLAGS[arch=*]" = "-DDebug";
-				PRODUCT_BUNDLE_IDENTIFIER = com.goldcoin.goldcoinwallet;
+				PRODUCT_BUNDLE_IDENTIFIER = org.goldcoin.goldcoinwallet1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1828,7 +1828,7 @@
 				CODE_SIGN_IDENTITY = "iPhone Distribution: GoldCoin Developers Group Lc (2EGNN2MXF5)";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2EGNN2MXF5;
+				DEVELOPMENT_TEAM = W9SD8ZY353;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1840,7 +1840,7 @@
 				INFOPLIST_FILE = BreadWallet/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = com.goldcoin.goldcoinwallet;
+				PRODUCT_BUNDLE_IDENTIFIER = org.goldcoin.goldcoinwallet1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2113,7 +2113,7 @@
 				CODE_SIGN_ENTITLEMENTS = breadwallet/breadwallet.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = 2EGNN2MXF5;
+				DEVELOPMENT_TEAM = W9SD8ZY353;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "BreadWallet/BreadWallet-Prefix.pch";
 				GCC_PREPROCESSOR_DEFINITIONS = "TESTFLIGHT=1";
@@ -2127,7 +2127,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_SWIFT_FLAGS = "-DTestflight";
-				PRODUCT_BUNDLE_IDENTIFIER = com.goldcoin.goldcoinwallet;
+				PRODUCT_BUNDLE_IDENTIFIER = org.goldcoin.goldcoinwallet1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
 				PROVISIONING_PROFILE_SPECIFIER = "";
