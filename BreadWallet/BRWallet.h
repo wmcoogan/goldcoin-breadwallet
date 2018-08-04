@@ -33,7 +33,7 @@ FOUNDATION_EXPORT NSString* _Nonnull const BRWalletBalanceChangedNotification;
 
 #define SATOSHIS           100000000LL
 #define MAX_MONEY          (72245700LL*SATOSHIS)
-#define DEFAULT_FEE_PER_KB ((1000000ULL*1000 + 99)/100)
+#define DEFAULT_FEE_PER_KB ((100000ULL*1000 + 99)/100)
 #define MIN_FEE_PER_KB     ((TX_FEE_PER_KB*1000 + 190)/191) // minimum relay fee on a 191byte tx
 #define MAX_FEE_PER_KB     ((1010000ULL*1000 + 190)/191) // slightly higher than a 1000bit fee on a 191byte tx
 
