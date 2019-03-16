@@ -1,0 +1,5 @@
+Requested permissions:
+
+**Camera **allows for scanning QR codes. Immediately after parsing the QR code, the image is deleted from memory.
+**Full network access **enables the app to connect to the GoldCoin network and fetch auxillary data like exchange rates.
+GoldCoin is decentralized. There is no server that would hold any of your private data.
