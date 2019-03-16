@@ -43,13 +43,13 @@
 #define CIRCLE  @"\xE2\x97\x8C" // dotted circle (utf-8)
 #define DOT     @"\xE2\x97\x8F" // black circle (utf-8)
 
-#define UNSPENT_URL          @"https://chainz.cryptoid.info/gld/api.dws?q=unspent&key=d47da926b82e&active="
-#define UNSPENT_FAILOVER_URL @"https://chainz.cryptoid.info/gld/api.dws?q=unspent&key=d47da926b82e&active="
+#define UNSPENT_URL          @"https://chainz.cryptoid.info/glc/api.dws?q=unspent&key=d47da926b82e&active="
+#define UNSPENT_FAILOVER_URL @"https://chainz.cryptoid.info/glc/api.dws?q=unspent&key=d47da926b82e&active="
 #define FEE_PER_KB_URL       @"https://api.breadwallet.com/fee-per-kb"
 #define TICKER_URL           @"https://api.breadwallet.com/rates"
 #define TICKER_FAILOVER_URL  @"https://bitpay.com/rates"
 
-#define TICKER_GLD_URL       @"https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-gld"
+#define TICKER_GLD_URL       @"https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-glc"
 #define TICKER_GLD_FAILOVER_URL @"https://www.cryptopia.co.nz/api/GetMarket/2623"
 #define POLONIEX_TICKER_URL  TICKER_GLD_URL
 #define TICKER_REFRESH_TIME 60.0
