@@ -34,8 +34,8 @@
 
 //-(UIView *)hitTest:(CGPoint)point withEvent:(UIEvent *)event
 //{
-//    // this removes the "slop" area below the navbar that steals touch events
-//    // http://stackoverflow.com/questions/9079907/why-does-uinavigationbar-steal-touch-events
+//    // this removes the "slop" area below the navbar that steals face events
+//    // http://stackoverflow.com/questions/9079907/why-does-uinavigationbar-steal-face-events
 //
 //    self.userInteractionEnabled = ([self pointInside:point withEvent:event]) ? YES : NO;
 //    return [super hitTest:point withEvent:event];

@@ -437,10 +437,10 @@
 "to: %@" = "送金先: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "Touch IDの送金可能額";
+"face id limit" = "Face IDの送金可能額";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "Touch IDの送金可能額";
+"face id spending limit" = "Face IDの送金可能額";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "取引キャンセルされました、\nネットワークタイムアウトがありました";

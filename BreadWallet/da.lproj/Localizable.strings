@@ -425,10 +425,10 @@
 "to: %@" = "til: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "grænse for touch id";
+"face id limit" = "grænse for face id";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "betalingsgrænse for touch id";
+"face id spending limit" = "betalingsgrænse for face id";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "transaktion annullet, netværk-timeout";

@@ -36,7 +36,7 @@
 
 @interface BRSettingsViewController ()
 
-@property (nonatomic, assign) BOOL touchId;
+@property (nonatomic, assign) BOOL faceId;
 @property (nonatomic, strong) UITableViewController *selectorController;
 @property (nonatomic, strong) NSArray *selectorOptions;
 @property (nonatomic, strong) NSString *selectedOption, *noOptionsText;
@@ -53,7 +53,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.touchId = [BRWalletManager sharedInstance].touchIdEnabled;
+    self.faceId = [BRWalletManager sharedInstance].faceIdEnabled;
 }
 
 
@@ -228,12 +228,12 @@
     }
 }
 
-- (IBAction)touchIdLimit:(id)sender
+- (IBAction)faceIdLimit:(id)sender
 {
-    [BREventManager saveEvent:@"settings:touch_id_limit"];
+    [BREventManager saveEvent:@"settings:face_id_limit"];
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
-    if ([manager authenticateWithPrompt:nil andTouchId:NO]) {
+    if ([manager authenticateWithPrompt:nil andFaceId:NO]) {
         self.selectorType = 1;
         self.selectorOptions =
             @[NSLocalizedString(@"always require passcode", nil),
@@ -247,7 +247,7 @@
         self.selectedOption = self.selectorOptions[(log10(manager.spendingLimit) < 6) ? 0 :
                                                    (NSUInteger)log10(manager.spendingLimit) - 6];
         self.noOptionsText = nil;
-        self.selectorController.title = NSLocalizedString(@"touch id spending limit", nil);
+        self.selectorController.title = NSLocalizedString(@"face id spending limit", nil);
         [self.navigationController pushViewController:self.selectorController animated:YES];
         [self.selectorController.tableView reloadData];
     }
@@ -286,7 +286,7 @@
     
     switch (section) {
         case 0: return 2;
-        case 1: return (self.touchId) ? 3 : 2;
+        case 1: return (self.faceId) ? 3 : 2;
         case 2: return 3;
         case 3: return 1;
     }
@@ -338,9 +338,9 @@
                     break;
             
                 case 1:
-                    if (self.touchId) {
+                    if (self.faceId) {
                         cell = [tableView dequeueReusableCellWithIdentifier:selectorIdent];
-                        cell.textLabel.text = NSLocalizedString(@"touch id limit", nil);
+                        cell.textLabel.text = NSLocalizedString(@"face id limit", nil);
                         cell.detailTextLabel.text = [manager stringForAmount:manager.spendingLimit];
                     } else {
                         goto _switch_cell;
@@ -614,9 +614,9 @@ _switch_cell:
                     
                     break;
                     
-                case 1: // touch id spending limit
-                    if (self.touchId) {
-                        [self performSelector:@selector(touchIdLimit:) withObject:nil afterDelay:0.0];
+                case 1: // face id spending limit
+                    if (self.faceId) {
+                        [self performSelector:@selector(faceIdLimit:) withObject:nil afterDelay:0.0];
                         break;
                     } else {
                         goto _deselect_switch;

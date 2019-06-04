@@ -87,7 +87,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>004</string>
+	<string>005</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSRequiresIPhoneOS</key>
@@ -99,6 +99,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to scan barcodes</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>Used to unlock app</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>We will use your location to determine where you are. Your location will never be recorded or shared with anyone.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

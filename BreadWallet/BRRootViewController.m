@@ -476,7 +476,7 @@
 #endif
 
         if ([defs doubleForKey:PIN_UNLOCK_TIME_KEY] + 7*24*60*60 < [NSDate timeIntervalSinceReferenceDate]) {
-            while (! [manager authenticateWithPrompt:nil andTouchId:NO]) { }
+            while (! [manager authenticateWithPrompt:nil andFaceId:NO]) { }
             [self unlock:nil];
         }
 
@@ -887,7 +887,7 @@
     [BREventManager saveEvent:@"root:unlock"];
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     
-    if (sender && ! manager.didAuthenticate && ! [manager authenticateWithPrompt:nil andTouchId:YES]) return;
+    if (sender && ! manager.didAuthenticate && ! [manager authenticateWithPrompt:nil andFaceId:YES]) return;
     [BREventManager saveEvent:@"root:unlock_success"];
     
     self.navigationItem.titleView = nil;

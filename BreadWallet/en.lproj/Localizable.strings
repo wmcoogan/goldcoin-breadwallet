@@ -440,10 +440,10 @@
 "to: %@" = "to: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "touch id limit";
+"face id limit" = "face id limit";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "touch id spending limit";
+"face id spending limit" = "face id spending limit";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "transaction canceled, network timeout";

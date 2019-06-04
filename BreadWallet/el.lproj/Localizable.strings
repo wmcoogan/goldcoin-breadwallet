@@ -425,10 +425,10 @@
 "to: %@" = "προς: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "αναγνωριστικό όριο αφής";
+"face id limit" = "αναγνωριστικό όριο αφής";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "αναγνωριστικό όριο ξοδέματος αφής";
+"face id spending limit" = "αναγνωριστικό όριο ξοδέματος αφής";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "η συναλλαγή ακυρώθηκε, λήξη χρονικού ορίου δικτύου";

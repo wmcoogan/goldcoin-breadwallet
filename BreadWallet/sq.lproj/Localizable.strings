@@ -404,10 +404,10 @@
 "to: %@" = "te: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "touch id limiti";
+"face id limit" = "face id limiti";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "touch id limiti shpenzues";
+"face id spending limit" = "face id limiti shpenzues";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "transaksioni u anulua, problem me rrjetin";

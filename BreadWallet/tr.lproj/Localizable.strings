@@ -425,10 +425,10 @@
 "to: %@" = "hedef: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "kimlik sınırına dokunun";
+"face id limit" = "kimlik sınırına dokunun";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "kimlik gönderme sınırına dokunun";
+"face id spending limit" = "kimlik gönderme sınırına dokunun";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "işlem iptal edildi, ağ zaman aşımına uğradı";

@@ -164,7 +164,7 @@ static NSString *sanitizeString(NSString *s)
             [self scanQR:self.scanButton];
         }
         else if ([url.host isEqual:@"addresslist"] || [url.path isEqual:@"/addresslist"]) { // copy wallet addresses
-            if ((manager.didAuthenticate || [manager authenticateWithPrompt:nil andTouchId:YES])
+            if ((manager.didAuthenticate || [manager authenticateWithPrompt:nil andFaceId:YES])
                 && ! self.clearClipboard) {
                 
                 if (! [self.url isEqual:url]) {

@@ -398,10 +398,10 @@
 "to: %@" = "naar: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "touch id limiet";
+"face id limit" = "face id limiet";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "touch id uitgave limiet";
+"face id spending limit" = "face id uitgave limiet";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "transactie geannuleerd, netwerk timeout";

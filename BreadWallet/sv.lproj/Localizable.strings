@@ -398,10 +398,10 @@
 "to: %@" = "till: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "gräns för touch id";
+"face id limit" = "gräns för face id";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "touch id beloppsgräns";
+"face id spending limit" = "face id beloppsgräns";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "transaktionen avbruten – nätverksavbrott";

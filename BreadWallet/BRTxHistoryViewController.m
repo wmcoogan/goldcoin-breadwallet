@@ -362,7 +362,7 @@ static NSString *dateFormat(NSString *template)
     BRWalletManager *manager = [BRWalletManager sharedInstance];
 
     if (sender) [BREventManager saveEvent:@"tx_history:unlock"];
-    if (! manager.didAuthenticate && ! [manager authenticateWithPrompt:nil andTouchId:YES]) return;
+    if (! manager.didAuthenticate && ! [manager authenticateWithPrompt:nil andFaceId:YES]) return;
     if (sender) [BREventManager saveEvent:@"tx_history:unlock_success"];
     
     self.navigationItem.titleView = nil;

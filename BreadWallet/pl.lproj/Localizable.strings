@@ -425,10 +425,10 @@
 "to: %@" = "do: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "limit dotykowego id";
+"face id limit" = "limit dotykowego id";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "limit wydatków dotykowego id";
+"face id spending limit" = "limit wydatków dotykowego id";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "transakcja anulowana, pszekroczono limit czasu oczekiwania sieci";

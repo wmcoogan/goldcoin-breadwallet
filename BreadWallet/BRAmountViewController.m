@@ -154,7 +154,7 @@
     BRWalletManager *manager = [BRWalletManager sharedInstance];
     [BREventManager saveEvent:@"amount:unlock"];
     
-    if (sender && ! manager.didAuthenticate && ! [manager authenticateWithPrompt:nil andTouchId:YES]) return;
+    if (sender && ! manager.didAuthenticate && ! [manager authenticateWithPrompt:nil andFaceId:YES]) return;
     [BREventManager saveEvent:@"amount:successful_unlock"];
     
     self.navigationItem.titleView = nil;

@@ -54,10 +54,10 @@ FOUNDATION_EXPORT NSString* _Nonnull const BRWalletManagerSeedChangedNotificatio
 @property (nonatomic, copy) NSString * _Nullable seedPhrase; // requesting seedPhrase will trigger authentication
 @property (nonatomic, readonly) NSTimeInterval seedCreationTime; // interval since refrence date, 00:00:00 01/01/01 GMT
 @property (nonatomic, readonly) NSTimeInterval secureTime; // last known time from an ssl server connection
-@property (nonatomic, assign) uint64_t spendingLimit; // amount that can be spent using touch id without pin entry
+@property (nonatomic, assign) uint64_t spendingLimit; // amount that can be spent using face id without pin entry
 @property (nonatomic, readonly) NSString * _Nullable authPrivateKey; // private key for signing authenticated api calls
 @property (nonatomic, copy) NSDictionary * _Nullable userAccount; // client api user id and auth token
-@property (nonatomic, readonly, getter=isTouchIdEnabled) BOOL touchIdEnabled; // true if touch id is enabled
+@property (nonatomic, readonly, getter=isFaceIdEnabled) BOOL faceIdEnabled; // true if face id is enabled
 @property (nonatomic, readonly, getter=isPasscodeEnabled) BOOL passcodeEnabled; // true if device passcode is enabled
 @property (nonatomic, assign) BOOL didAuthenticate; // true if the user authenticated after this was last set to false
 @property (nonatomic, readonly) NSNumberFormatter * _Nullable format; // goldcoin currency formatter
@@ -76,7 +76,7 @@ FOUNDATION_EXPORT NSString* _Nonnull const BRWalletManagerSeedChangedNotificatio
 - (NSString * _Nullable)generateRandomSeed; // generates a random seed, saves to keychain and returns the seedPhrase
 - (NSData * _Nullable)seedWithPrompt:(NSString * _Nullable)authprompt forAmount:(uint64_t)amount;//auth user,return seed
 - (NSString * _Nullable)seedPhraseWithPrompt:(NSString * _Nullable)authprompt; // authenticates user, returns seedPhrase
-- (BOOL)authenticateWithPrompt:(NSString * _Nullable)authprompt andTouchId:(BOOL)touchId; // prompt user to authenticate
+- (BOOL)authenticateWithPrompt:(NSString * _Nullable)authprompt andFaceId:(BOOL)faceId; // prompt user to authenticate
 - (BOOL)setPin; // prompts the user to set or change wallet pin and returns true if the pin was successfully set
 
 // queries api.breadwallet.com and calls the completion block with unspent outputs for the given address

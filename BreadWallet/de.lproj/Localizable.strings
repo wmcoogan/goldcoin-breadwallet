@@ -437,10 +437,10 @@
 "to: %@" = "An: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "Touch-ID Limit";
+"face id limit" = "Face-ID Limit";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "Touch-ID Ausgabelimite";
+"face id spending limit" = "Face-ID Ausgabelimite";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "Transaktion abgebrochen, Zeitüberschreitung im Netz";

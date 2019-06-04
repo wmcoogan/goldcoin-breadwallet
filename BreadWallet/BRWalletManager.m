@@ -474,8 +474,8 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
     setKeychainDict(userAccount, USER_ACCOUNT_KEY, NO);
 }
 
-// true if touch id is enabled
-- (BOOL)isTouchIdEnabled
+// true if face id is enabled
+- (BOOL)isFaceIdEnabled
 {
     return ([LAContext class] &&
             [[LAContext new] canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:nil]) ? YES : NO;
@@ -514,12 +514,12 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
 - (NSData *)seedWithPrompt:(NSString *)authprompt forAmount:(uint64_t)amount
 {
     @autoreleasepool {
-        BOOL touchid = (self.wallet.totalSent + amount < getKeychainInt(SPEND_LIMIT_KEY, nil)) ? YES : NO;
+        BOOL faceid = (self.wallet.totalSent + amount < getKeychainInt(SPEND_LIMIT_KEY, nil)) ? YES : NO;
 
-        if (! [self authenticateWithPrompt:authprompt andTouchId:touchid]) return nil;
-        // BUG: if user manually chooses to enter pin, the touch id spending limit is reset, but the tx being authorized
-        // still counts towards the next touch id spending limit
-        if (! touchid) setKeychainInt(self.wallet.totalSent + amount + self.spendingLimit, SPEND_LIMIT_KEY, NO);
+        if (! [self authenticateWithPrompt:authprompt andFaceId:faceid]) return nil;
+        // BUG: if user manually chooses to enter pin, the face id spending limit is reset, but the tx being authorized
+        // still counts towards the next face id spending limit
+        if (! faceid) setKeychainInt(self.wallet.totalSent + amount + self.spendingLimit, SPEND_LIMIT_KEY, NO);
         return [self.mnemonic deriveKeyFromPhrase:getKeychainString(MNEMONIC_KEY, nil) withPassphrase:nil];
     }
 }
@@ -528,22 +528,22 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
 - (NSString *)seedPhraseWithPrompt:(NSString *)authprompt
 {
     @autoreleasepool {
-        return ([self authenticateWithPrompt:authprompt andTouchId:NO]) ? getKeychainString(MNEMONIC_KEY, nil) : nil;
+        return ([self authenticateWithPrompt:authprompt andFaceId:NO]) ? getKeychainString(MNEMONIC_KEY, nil) : nil;
     }
 }
 
 // MARK: - authentication
 
-// prompts user to authenticate with touch id or passcode
-- (BOOL)authenticateWithPrompt:(NSString *)authprompt andTouchId:(BOOL)touchId
+// prompts user to authenticate with face id or passcode
+- (BOOL)authenticateWithPrompt:(NSString *)authprompt andFaceId:(BOOL)faceId
 {
-    if (touchId && [LAContext class]) { // check if touch id framework is available
+    if (faceId && [LAContext class]) { // check if face id framework is available
         NSTimeInterval pinUnlockTime = [[NSUserDefaults standardUserDefaults] doubleForKey:PIN_UNLOCK_TIME_KEY];
         LAContext *context = [LAContext new];
         NSError *error = nil;
         __block NSInteger authcode = 0;
 
-        [BREventManager saveEvent:@"wallet_manager:touchid_auth"];
+        [BREventManager saveEvent:@"wallet_manager:faceid_auth"];
 
         if ([context canEvaluatePolicy:LAPolicyDeviceOwnerAuthenticationWithBiometrics error:&error] &&
             pinUnlockTime + 7*24*60*60 > [NSDate timeIntervalSinceReferenceDate] &&
@@ -572,7 +572,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
         else if (error) NSLog(@"[LAContext canEvaluatePolicy:] %@", error.localizedDescription);
     }
 
-    // TODO explain reason when touch id is disabled after 30 days without pin unlock
+    // TODO explain reason when face id is disabled after 30 days without pin unlock
     if ([self authenticatePinWithTitle:[NSString stringWithFormat:NSLocalizedString(@"passcode for %@", nil),
                                         DISPLAY_NAME] message:authprompt]) {
         [self.alertView dismissWithClickedButtonIndex:self.alertView.cancelButtonIndex animated:YES];
@@ -835,7 +835,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
     return NO;
 }
 
-// amount that can be spent using touch id without pin entry
+// amount that can be spent using face id without pin entry
 - (uint64_t)spendingLimit
 {
     // it's ok to store this in userdefaults because increasing the value only takes effect after successful pin entry

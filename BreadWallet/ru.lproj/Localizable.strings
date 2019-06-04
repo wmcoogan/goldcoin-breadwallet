@@ -437,10 +437,10 @@
 "to: %@" = "кому: %@";
 
 /* No comment provided by engineer. */
-"touch id limit" = "лимит Touch ID";
+"face id limit" = "лимит Face ID";
 
 /* No comment provided by engineer. */
-"touch id spending limit" = "лимит расходов по Touch ID";
+"face id spending limit" = "лимит расходов по Face ID";
 
 /* No comment provided by engineer. */
 "transaction canceled, network timeout" = "транзакция отменена, время ожидания сети истекло";
