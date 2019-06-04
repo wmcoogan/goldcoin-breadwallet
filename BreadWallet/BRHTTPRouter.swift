@@ -40,7 +40,7 @@ public typealias BRHTTPRoute = (_ request: BRHTTPRequest, _ match: BRHTTPRouteMa
     open var regex: NSRegularExpression!
     var captureGroups: [Int: String]!
     
-    override open var hashValue: Int {
+    override open var hash: Int {
         return method.hashValue ^ path.hashValue
     }
     
