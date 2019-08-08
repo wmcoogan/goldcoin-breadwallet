@@ -485,7 +485,7 @@ func buildRequestSigningString(_ r: URLRequest) -> String {
     }
     
     open func updateFeatureFlags(onComplete: @escaping () -> Void) {
-        let req = URLRequest(url: url("/me/features"))
+        /*let req = URLRequest(url: url("/me/features"))
         dataTaskWithRequest(req, authenticated: true) { (data, resp, err) in
             if let resp = resp, let data = data {
                 let jsonString = String(data: data, encoding: .utf8)
@@ -512,7 +512,7 @@ func buildRequestSigningString(_ r: URLRequest) -> String {
                 self.log("error fetching features: \(String(describing: err))")
             }
             onComplete()
-        }.resume()
+        }.resume()*/
     }
     
     open func featureEnabled(_ flag: BRFeatureFlags) -> Bool {
@@ -523,8 +523,9 @@ func buildRequestSigningString(_ r: URLRequest) -> String {
         #if Testflight || Debug
             return true
         #else
-            let defaults = UserDefaults.standard
-            return defaults.bool(forKey: defaultsKeyForFeatureFlag(flag.description))
+            return true;
+//            let defaults = UserDefaults.standard
+  //          return defaults.bool(forKey: defaultsKeyForFeatureFlag(flag.description))
         #endif
     }
     
