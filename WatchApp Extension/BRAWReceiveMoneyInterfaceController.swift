@@ -87,8 +87,8 @@ class BRAWReceiveMoneyInterfaceController: WKInterfaceController, WCSessionDeleg
     }
     
     @IBAction func qrCodeTap(_ sender: AnyObject?) {
-        let ctx = BRAWKeypadModel(delegate: self)
-        self.presentController(withName: "Keypad", context: ctx)
+    //    let ctx = BRAWKeypadModel(delegate: self)
+    //    self.presentController(withName: "Keypad", context: ctx)
     }
     
     // - MARK: Keypad delegate
