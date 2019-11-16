@@ -49,7 +49,7 @@
 #define TICKER_URL           @"https://api.breadwallet.com/rates"
 #define TICKER_FAILOVER_URL  @"https://bitpay.com/rates"
 
-#define TICKER_GLD_URL       @"https://bittrex.com/api/v1.1/public/getmarketsummary?market=btc-glc"
+#define TICKER_GLD_URL       @"https://api.p2pb2b.io/api/v1/public/ticker?market=GLC_BTC"
 #define TICKER_GLD_FAILOVER_URL @"https://www.cryptopia.co.nz/api/GetMarket/2623"
 #define POLONIEX_TICKER_URL  TICKER_GLD_URL
 #define TICKER_REFRESH_TIME 60.0
@@ -1048,9 +1048,9 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
              }
              NSError *error = nil;
              NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-             NSArray * orders = [json objectForKey:@"result"];
-             if ([orders count]) {
-                 NSNumber * lastTradePrice = [[orders objectAtIndex:0] objectForKey:@"Last"];
+             NSDictionary * result = [json objectForKey:@"result"];
+             if (result) {
+                 NSNumber * lastTradePrice = [result objectForKey:@"last"];
                  if (lastTradePrice) {
                      NSNumberFormatter *numberFormatter = [[NSNumberFormatter alloc] init];
                      NSLocale *usa = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US"];
@@ -1064,7 +1064,7 @@ static NSDictionary *getKeychainDict(NSString *key, NSError **error)
                      [self refreshBitcoinDashPrice];
                  }
              }
-             NSLog(@"bittrex exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:SATOSHIS],
+             NSLog(@"p2pb2b.io exchange rate updated to %@/%@", [self localCurrencyStringForDashAmount:SATOSHIS],
                    [self stringForDashAmount:SATOSHIS]);
          }
       ] resume];
